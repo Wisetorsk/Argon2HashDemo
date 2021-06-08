@@ -56,12 +56,12 @@
         StateHasChanged();
     }
 
-    private void HashSomething()
+    private async Task HashSomething()
     {
         Console.WriteLine("RUNNING Argon2id");
-        Encrypt.CreateHashAndSalt("TestUser", inputText);
+        await Encrypt.CreateHashAndSalt("TestUser", inputText);
         _users.Add(_test);
-        _testString = inputSalt is null ? "null" : BitConverter.ToString(Encrypt.HashInput(inputText, Enumerable.Range(0, inputSalt.Length)
+        _testString = inputSalt is null ? "null" : BitConverter.ToString(await Encrypt.HashInput(inputText, Enumerable.Range(0, inputSalt.Length)
         .Where(x => x % 2 == 0)
         .Select(x => Convert.ToByte(inputSalt.Substring(x, 2), 16))
         .ToArray())).Replace("-", "");
@@ -70,6 +70,6 @@
 
     void IDisposable.Dispose()
     {
-
+        Encrypt.HashCalcualtionComplete -= HandleCompletedHash;
     }
 }

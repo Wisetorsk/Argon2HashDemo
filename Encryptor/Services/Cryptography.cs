@@ -14,6 +14,7 @@ namespace Services
         public bool CalculationRunning { get; set; } = false;
         public event EventHandler<HashEventArgs> HashCalcualtionComplete;
         public event EventHandler<HashVerificationEventArgs> HashVerificationComplete;
+        private Argon2 Argon { get; set; }
 
         protected virtual void AlertCalculationComplete(UserHash user)
         {
@@ -45,18 +46,22 @@ namespace Services
         /// <param name="inputString"></param>
         /// <param name="salt"></param>
         /// <returns></returns>
-        public byte[] HashInput(string inputString, byte[] salt)
+        public async Task<byte[]> HashInput(string inputString, byte[] salt)
         {
             CalculationRunning = true;
             byte[] hashedBytes;
-            using (var argon2 = new Argon2id(Encoding.UTF8.GetBytes(inputString)))
-            {
-                argon2.Salt = salt;
-                argon2.DegreeOfParallelism = 4; // Number of threads to utilize
-                argon2.Iterations = 4;
-                argon2.MemorySize = 256 * 256; // Set to a defualt of 1024^2 memory size... 
-                hashedBytes = argon2.GetBytes(16);
-            };
+            hashedBytes = await CalculateHashAsync(inputString, salt);
+            return hashedBytes;
+
+        }
+
+        private async Task<byte[]> CalculateHashAsync(string inputString, byte[] salt)
+        {
+            byte[] hashedBytes;
+            Argon = new(inputString, salt);
+            hashedBytes = await Argon.CalculateHashAsync();
+            Argon?.Dispose();
+            Argon = null;
             return hashedBytes;
         }
 
@@ -67,9 +72,9 @@ namespace Services
         /// <param name="salt"></param>
         /// <param name="hash"></param>
         /// <returns></returns>
-        public bool VerifyHash(string inputString, byte[] salt, byte[] hash)
+        public async Task<bool> VerifyHash(string inputString, byte[] salt, byte[] hash)
         {
-            var newHash = HashInput(inputString, salt);
+            var newHash = await HashInput(inputString, salt);
             var result = hash.SequenceEqual(newHash);
             return result; // Can also be set as async Task or void.
         }
@@ -80,9 +85,9 @@ namespace Services
         /// <param name="inputString"></param>
         /// <param name="hashedUser"></param>
         /// <returns></returns>
-        public bool VerifyHash(string inputString, UserHash hashedUser)
+        public async Task<bool> VerifyHash(string inputString, UserHash hashedUser)
         {
-            var newHash = HashInput(inputString, hashedUser.Salt);
+            var newHash = await HashInput(inputString, hashedUser.Salt);
             var result = hashedUser.Hash.SequenceEqual(newHash);
             return result; // Can also be set as async Task or void.
         }
@@ -93,9 +98,9 @@ namespace Services
         /// <param name="inputString"></param>
         /// <param name="salt"></param>
         /// <param name="hash"></param>
-        public void VerifyHashEvent(string inputString, byte[] salt, byte[] hash)
+        public async Task VerifyHashEvent(string inputString, byte[] salt, byte[] hash)
         {
-            var newHash = HashInput(inputString, salt);
+            var newHash = await HashInput(inputString, salt);
             var result = hash.SequenceEqual(newHash);
             AlertHashVerificationComplete(result);
         }
@@ -105,9 +110,9 @@ namespace Services
         /// </summary>
         /// <param name="inputString"></param>
         /// <param name="hashedUser"></param>
-        public void VerifyHashEvent(string inputString, UserHash hashedUser)
+        public async Task VerifyHashEvent(string inputString, UserHash hashedUser)
         {
-            var newHash = HashInput(inputString, hashedUser.Salt);
+            var newHash = await HashInput(inputString, hashedUser.Salt);
             var result = hashedUser.Hash.SequenceEqual(newHash);
             AlertHashVerificationComplete(result);
         }
@@ -120,10 +125,10 @@ namespace Services
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public void CreateHashAndSalt(string username, string password)
+        public async Task CreateHashAndSalt(string username, string password)
         {
             var salt = CreateSalt();
-            var hash = HashInput(password, salt);
+            var hash = await HashInput(password, salt);
             var user = new UserHash
             {
                 Salt = salt,

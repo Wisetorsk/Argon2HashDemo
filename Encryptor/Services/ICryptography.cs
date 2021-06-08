@@ -1,5 +1,6 @@
 ﻿using DataObjects;
 using System;
+using System.Threading.Tasks;
 
 namespace Services
 {
@@ -10,14 +11,14 @@ namespace Services
         event EventHandler<HashEventArgs> HashCalcualtionComplete;
         event EventHandler<HashVerificationEventArgs> HashVerificationComplete;
 
-        void CreateHashAndSalt(string username, string password);
+        Task CreateHashAndSalt(string username, string password);
         byte[] CreateSalt();
         byte[] Decrypt(string inputString, byte[] key);
         byte[] Encrypt(string inputString);
-        byte[] HashInput(string inputString, byte[] salt);
-        bool VerifyHash(string inputString, byte[] salt, byte[] hash);
-        bool VerifyHash(string inputString, UserHash hashedUser);
-        void VerifyHashEvent(string inputString, byte[] salt, byte[] hash);
-        void VerifyHashEvent(string inputString, UserHash hashedUser);
+        Task<byte[]> HashInput(string inputString, byte[] salt);
+        Task<bool> VerifyHash(string inputString, byte[] salt, byte[] hash);
+        Task<bool> VerifyHash(string inputString, UserHash hashedUser);
+        Task VerifyHashEvent(string inputString, byte[] salt, byte[] hash);
+        Task VerifyHashEvent(string inputString, UserHash hashedUser);
     }
 }
