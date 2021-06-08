@@ -1,0 +1,73 @@
+﻿@page "/"
+@using KOMTEK.KundeInnsyn.Common.DataObjects
+@inject KOMTEK.KundeInnsyn.Common.Services.ICryptography Encrypt
+@implements IDisposable
+<Addons>
+    <Addon AddonType="AddonType.Start">
+        <AddonLabel>Input "passord"</AddonLabel>
+    </Addon>
+    <Addon AddonType="AddonType.End">
+        <TextEdit @bind-Text="@inputText" />
+    </Addon>
+</Addons>
+
+<Addons>
+    <Addon AddonType="AddonType.Start">
+        <AddonLabel>Input Salt</AddonLabel>
+    </Addon>
+    <Addon AddonType="AddonType.End">
+        <TextEdit @bind-Text="@inputSalt" />
+
+    </Addon>
+</Addons>
+
+<Button Color="Color.Primary" Clicked="HashSomething">HASH!</Button>
+@if (_test is not null)
+{
+    <div>Hash med random salt: @_test.HashString</div>
+    <div>Random Salt: @_test.SaltString</div>
+}
+@if (_testString is not null)
+{
+    <div>Hash med samme salt: @_testString</div>
+}
+
+
+@code {
+    private UserHash _test { get; set; }
+    private string inputText { get; set; }
+    private string inputSalt { get; set; }
+    private string _testString;
+    private string _hash = null;
+    private List<UserHash>
+    _users = new List<UserHash>
+        ();
+
+    protected override void OnInitialized()
+    {
+        Encrypt.HashCalcualtionComplete += HandleCompletedHash;
+    }
+
+    private void HandleCompletedHash(object sender, HashEventArgs userhashData)
+    {
+        _test = userhashData.User;
+        StateHasChanged();
+    }
+
+    private void HashSomething()
+    {
+        Console.WriteLine("RUNNING ENCRYPTION");
+        Encrypt.CreateHashAndSalt("TestUser", inputText);
+        _users.Add(_test);
+        _testString = inputSalt is null ? "null" : BitConverter.ToString(Encrypt.HashInput(inputText, Enumerable.Range(0, inputSalt.Length)
+        .Where(x => x % 2 == 0)
+        .Select(x => Convert.ToByte(inputSalt.Substring(x, 2), 16))
+        .ToArray())).Replace("-", "");
+        StateHasChanged();
+    }
+
+    void IDisposable.Dispose()
+    {
+
+    }
+}
