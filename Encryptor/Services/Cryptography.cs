@@ -61,7 +61,7 @@ namespace Services
             Argon = new(inputString, salt);
             hashedBytes = await Argon.CalculateHashAsync();
             Argon?.Dispose();
-            Argon = null;
+            Argon = null; // overkill
             return hashedBytes;
         }
 
