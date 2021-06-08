@@ -1,6 +1,6 @@
 ﻿@page "/"
-@using KOMTEK.KundeInnsyn.Common.DataObjects
-@inject KOMTEK.KundeInnsyn.Common.Services.ICryptography Encrypt
+@using DataObjects
+@inject Services.ICryptography Encrypt
 @implements IDisposable
 <Addons>
     <Addon AddonType="AddonType.Start">
@@ -22,15 +22,18 @@
 </Addons>
 
 <Button Color="Color.Primary" Clicked="HashSomething">HASH!</Button>
+<Divider DividerType="DividerType.TextContent" Text="Hash Results" />
 @if (_test is not null)
 {
-    <div>Hash med random salt: @_test.HashString</div>
+    <div>Hash med random Salt: @_test.HashString</div>
     <div>Random Salt: @_test.SaltString</div>
 }
 @if (_testString is not null)
 {
-    <div>Hash med samme salt: @_testString</div>
+    <div>Hash med samme Salt: @_testString</div>
 }
+
+
 
 
 @code {
@@ -40,8 +43,7 @@
     private string _testString;
     private string _hash = null;
     private List<UserHash>
-    _users = new List<UserHash>
-        ();
+    _users = new List<UserHash>();
 
     protected override void OnInitialized()
     {
@@ -56,7 +58,7 @@
 
     private void HashSomething()
     {
-        Console.WriteLine("RUNNING ENCRYPTION");
+        Console.WriteLine("RUNNING Argon2id");
         Encrypt.CreateHashAndSalt("TestUser", inputText);
         _users.Add(_test);
         _testString = inputSalt is null ? "null" : BitConverter.ToString(Encrypt.HashInput(inputText, Enumerable.Range(0, inputSalt.Length)

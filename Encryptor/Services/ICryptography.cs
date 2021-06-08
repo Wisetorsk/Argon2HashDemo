@@ -1,7 +1,7 @@
-﻿using KOMTEK.KundeInnsyn.Common.DataObjects;
+﻿using DataObjects;
 using System;
 
-namespace KOMTEK.KundeInnsyn.Common.Services
+namespace Services
 {
     public interface ICryptography
     {

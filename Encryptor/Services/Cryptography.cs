@@ -4,10 +4,10 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using KOMTEK.KundeInnsyn.Common.DataObjects;
+using DataObjects;
 using Konscious.Security.Cryptography;
 
-namespace KOMTEK.KundeInnsyn.Common.Services
+namespace Services
 {
     public class Cryptography : ICryptography
     {

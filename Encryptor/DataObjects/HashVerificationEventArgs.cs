@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace KOMTEK.KundeInnsyn.Common.DataObjects
+namespace DataObjects
 {
     public class HashVerificationEventArgs : EventArgs
     {
