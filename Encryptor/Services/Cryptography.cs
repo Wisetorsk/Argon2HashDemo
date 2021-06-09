@@ -9,8 +9,10 @@ using Konscious.Security.Cryptography;
 
 namespace Services
 {
-    public class Cryptography : ICryptography
+    public class Cryptography : ICryptography, IDisposable
     {
+        private bool _disposed = false;
+
         public bool CalculationRunning { get; set; } = false;
         public event EventHandler<HashEventArgs> HashCalcualtionComplete;
         public event EventHandler<HashVerificationEventArgs> HashVerificationComplete;
@@ -60,11 +62,34 @@ namespace Services
             byte[] hashedBytes;
             Argon = new(inputString, salt);
             hashedBytes = await Argon.CalculateHashAsync();
-            Argon?.Dispose();
-            Argon = null; // overkill
+            
             return hashedBytes;
         }
 
+        ~Cryptography() => Dispose(false);
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                
+                Argon?.Dispose();
+            }
+
+            _disposed = true;
+        }
 
         //private static async Task<byte[]> CalculateHashAsync(string inputString, byte[] salt)
         //{
@@ -88,6 +113,7 @@ namespace Services
         {
             var newHash = await HashInput(inputString, salt);
             var result = hash.SequenceEqual(newHash);
+            Argon?.Dispose();
             return result; // Can also be set as async Task or void.
         }
 
@@ -101,6 +127,7 @@ namespace Services
         {
             var newHash = await HashInput(inputString, hashedUser.Salt);
             var result = hashedUser.Hash.SequenceEqual(newHash);
+            Argon?.Dispose();
             return result; // Can also be set as async Task or void.
         }
 
@@ -114,6 +141,7 @@ namespace Services
         {
             var newHash = await HashInput(inputString, salt);
             var result = hash.SequenceEqual(newHash);
+            Argon?.Dispose();
             AlertHashVerificationComplete(result);
         }
 
@@ -126,6 +154,7 @@ namespace Services
         {
             var newHash = await HashInput(inputString, hashedUser.Salt);
             var result = hashedUser.Hash.SequenceEqual(newHash);
+            Argon?.Dispose();
             AlertHashVerificationComplete(result);
         }
 
@@ -147,6 +176,7 @@ namespace Services
                 Username = username,
                 Hash = hash
             };
+            Argon?.Dispose();
             AlertCalculationComplete(user);
         }
 

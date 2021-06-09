@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace Services
 {
-    public class Argon2
+    public class Argon2 : IDisposable
     {
 
         private bool _disposed = false;
 
-        private SafeHandle _safeHandle = new SafeFileHandle(IntPtr.Zero, true);
+        //private SafeHandle _safeHandle = new SafeFileHandle(IntPtr.Zero, true);
 
-        public void Dispose() => Dispose(true);
+        ~Argon2() => Dispose(false);
 
         private Argon2id ArgonHasher;
 
@@ -47,6 +47,12 @@ namespace Services
             return hashedBytes;
         }
 
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed)
@@ -58,7 +64,7 @@ namespace Services
             {
                 // Dispose managed state (managed objects).
                 ArgonHasher?.Dispose();
-                _safeHandle?.Dispose();
+                //_safeHandle?.Dispose();
             }
 
             _disposed = true;

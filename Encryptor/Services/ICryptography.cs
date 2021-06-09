@@ -20,5 +20,6 @@ namespace Services
         Task<bool> VerifyHash(string inputString, UserHash hashedUser);
         Task VerifyHashEvent(string inputString, byte[] salt, byte[] hash);
         Task VerifyHashEvent(string inputString, UserHash hashedUser);
+        void Dispose();
     }
 }

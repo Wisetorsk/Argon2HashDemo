@@ -71,5 +71,6 @@
     void IDisposable.Dispose()
     {
         Encrypt.HashCalcualtionComplete -= HandleCompletedHash;
+        Encrypt.Dispose();
     }
 }
