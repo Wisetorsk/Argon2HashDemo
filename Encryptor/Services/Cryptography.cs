@@ -91,15 +91,15 @@ namespace Services
             _disposed = true;
         }
 
-        //private static async Task<byte[]> CalculateHashAsync(string inputString, byte[] salt)
-        //{
-        //    byte[] hashedBytes;
-        //    Argon2 Argon = new(inputString, salt);
-        //    hashedBytes = await Argon.CalculateHashAsync();
-        //    Argon?.Dispose();
-        //    //Argon = null; // overkill
-        //    return hashedBytes;
-        //}
+        private static async Task<byte[]> StaticCalculateHashAsync(string inputString, byte[] salt)
+        {
+            byte[] hashedBytes;
+            Argon2 Argon = new(inputString, salt);
+            hashedBytes = await Argon.CalculateHashAsync();
+            Argon?.Dispose();
+            //Argon = null; // overkill
+            return hashedBytes;
+        }
 
 
         /// <summary>
