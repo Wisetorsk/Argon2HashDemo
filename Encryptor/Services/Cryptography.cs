@@ -65,6 +65,18 @@ namespace Services
             return hashedBytes;
         }
 
+
+        //private static async Task<byte[]> CalculateHashAsync(string inputString, byte[] salt)
+        //{
+        //    byte[] hashedBytes;
+        //    Argon2 Argon = new(inputString, salt);
+        //    hashedBytes = await Argon.CalculateHashAsync();
+        //    Argon?.Dispose();
+        //    //Argon = null; // overkill
+        //    return hashedBytes;
+        //}
+
+
         /// <summary>
         /// Verifyes the given password vs stored hash and salt.
         /// </summary>
